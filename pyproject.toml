@@ -1,0 +1,7 @@
+[project]
+name = "mealmetrics"
+version = "0.1.0"
+description = "A report generator for Miran app take-home task"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
