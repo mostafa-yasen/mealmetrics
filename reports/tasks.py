@@ -26,7 +26,7 @@ def debug_celery_task() -> str:
 
 
 @shared_task(rate_limit="10/m", bind=True, max_retries=3, default_retry_delay=1 * 60)  # type: ignore[misc]
-def generate_report(self, report_id: str) -> None:  # type: ignore
+def generate_report(self: Task, report_id: str) -> None:
     start = time.time()
     _logger.info(f"Generating report for ID: {report_id}")
     try:
