@@ -165,6 +165,11 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/e2/10/c9020f6e5b293e4c24aa72cab7966bcd7f03b1196da9c5cf916da9873c48/django_stubs-5.2.1-py3-none-any.whl", hash = "sha256:c0e170d70329c27e737a5b80c5518fb6161d0c4792321d11a4a93dcda120f4ef", size = 484761, upload-time = "2025-06-17T18:07:34.554Z" },
 ]
 
+[package.optional-dependencies]
+compatible-mypy = [
+    { name = "mypy" },
+]
+
 [[package]]
 name = "django-stubs-ext"
 version = "5.2.1"
@@ -258,6 +263,7 @@ dependencies = [
     { name = "celery" },
     { name = "django" },
     { name = "django-dotenv" },
+    { name = "django-stubs", extra = ["compatible-mypy"] },
     { name = "djangorestframework" },
     { name = "itsdangerous" },
     { name = "openpyxl" },
@@ -280,6 +286,7 @@ requires-dist = [
     { name = "celery", specifier = ">=5.5.3" },
     { name = "django", specifier = ">=5.2.4" },
     { name = "django-dotenv", specifier = ">=1.4.2" },
+    { name = "django-stubs", extras = ["compatible-mypy"], specifier = ">=5.2.1" },
     { name = "djangorestframework", specifier = ">=3.16.0" },
     { name = "itsdangerous", specifier = ">=2.2.0" },
     { name = "openpyxl", specifier = ">=3.1.5" },

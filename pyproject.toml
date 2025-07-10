@@ -8,6 +8,7 @@ dependencies = [
     "celery>=5.5.3",
     "django>=5.2.4",
     "django-dotenv>=1.4.2",
+    "django-stubs[compatible-mypy]>=5.2.1",
     "djangorestframework>=3.16.0",
     "itsdangerous>=2.2.0",
     "openpyxl>=3.1.5",
@@ -38,3 +39,7 @@ known_first_party = ["reports", "mealsmetrics"]
 [tool.mypy]
 python_version = "3.12"
 strict = true
+plugins = ["mypy_django_plugin.main"]
+
+[tool.django-stubs]
+django_settings_module = "mealsmetrics.settings"

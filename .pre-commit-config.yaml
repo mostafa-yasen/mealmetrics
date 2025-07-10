@@ -5,10 +5,14 @@ repos:
       - id: ruff
       - id: ruff-format
 
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.10.0
-    hooks:
-      - id: mypy
+  # - repo: https://github.com/pre-commit/mirrors-mypy
+  #   rev: v1.10.0
+  #   hooks:
+  #     - id: mypy
+  #       additional_dependencies:
+  #         - django-stubs
+  # BUG: Issue with pre-commit hooks
+  # https://github.com/typeddjango/django-stubs/issues/1087#issuecomment-1208188250
 
   - repo: https://github.com/pycqa/isort
     rev: 5.13.2
