@@ -21,5 +21,5 @@ class Report(models.Model):
     file_path = models.CharField(max_length=512, null=True, blank=True)
     error = models.TextField(null=True, blank=True)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Report {self.id} ({self.status})"

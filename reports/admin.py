@@ -4,7 +4,7 @@ from .models import Report
 
 
 @admin.register(Report)
-class ReportAdmin(admin.ModelAdmin):
+class ReportAdmin(admin.ModelAdmin[Report]):
     list_display = ("id", "user", "status", "created_at", "completed_at")
     list_filter = ("status", "created_at")
     search_fields = ("user__username", "id")
