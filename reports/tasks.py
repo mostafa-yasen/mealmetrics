@@ -4,6 +4,7 @@ import logging
 import os
 import time
 from datetime import date, timedelta
+from typing import TYPE_CHECKING
 
 import pandas as pd  # type: ignore[import-untyped]
 from celery import shared_task  # type: ignore[import-untyped]
@@ -14,6 +15,9 @@ from django.db import models
 from django.utils import timezone
 
 from .models import FoodLog, Report
+
+if TYPE_CHECKING:
+    from celery import Task
 
 _logger = logging.getLogger(__name__)
 
