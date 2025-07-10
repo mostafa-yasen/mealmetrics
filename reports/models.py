@@ -23,3 +23,27 @@ class Report(models.Model):
 
     def __str__(self) -> str:
         return f"Report {self.id} ({self.status})"
+
+
+class FoodLog(models.Model):
+    FOOD_CATEGORIES = [
+        ("fruit", "Fruit"),
+        ("vegetable", "Vegetable"),
+        ("dairy", "Dairy"),
+        ("protein", "Protein"),
+        ("snack", "Snack"),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="food_logs")
+    food_name = models.CharField(max_length=100)
+    category = models.CharField(max_length=20, choices=FOOD_CATEGORIES)
+    date_logged = models.DateField()
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["date_logged"]),
+            models.Index(fields=["category"]),
+        ]
+
+    def __str__(self):
+        return f"{self.food_name} ({self.category}) - {self.user.username}"
