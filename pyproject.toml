@@ -17,8 +17,24 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "django-stubs>=5.2.1",
     "isort>=6.0.1",
     "mypy>=1.16.1",
+    "mypy-extensions>=1.1.0",
     "pre-commit>=4.2.0",
     "ruff>=0.12.2",
 ]
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+extend-select = ["B", "I", "PL"]
+exclude = ["migrations"]
+
+[tool.isort]
+profile = "black"
+known_first_party = ["reports", "mealsmetrics"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
