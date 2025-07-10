@@ -26,6 +26,8 @@ dev = [
     "mypy>=1.16.1",
     "mypy-extensions>=1.1.0",
     "pre-commit>=4.2.0",
+    "pytest>=8.4.1",
+    "pytest-django>=4.11.1",
     "ruff>=0.12.2",
 ]
 
@@ -43,6 +45,7 @@ known_first_party = ["reports", "mealsmetrics"]
 python_version = "3.12"
 strict = true
 plugins = ["mypy_django_plugin.main"]
+exclude = [".venv", "tests"]
 
 [tool.django-stubs]
 django_settings_module = "mealsmetrics.settings"
