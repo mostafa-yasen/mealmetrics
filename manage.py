@@ -22,6 +22,6 @@ def main() -> None:
 if __name__ == "__main__":
     import dotenv  # type: ignore[import-untyped]
 
-    dotenv.read_dotenv()
+    dotenv.load_dotenv()
 
     main()
