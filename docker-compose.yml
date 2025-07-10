@@ -32,7 +32,7 @@ services:
 
   worker:
     build: .
-    command: celery -A mealsmetrics worker --loglevel=info
+    command: celery -A mealsmetrics worker --loglevel=info --concurrency=2
     volumes:
       - .:/app
       - ./media:/app/media

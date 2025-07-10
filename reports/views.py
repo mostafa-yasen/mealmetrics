@@ -27,11 +27,21 @@ class ReportCreateView(generics.CreateAPIView):  # type: ignore[misc]
 
     def perform_create(self, serializer: ReportCreateSerializer) -> None:
         self.report: Report = serializer.save(user=self.request.user)
-        generate_report.delay(str(self.report.id))
+        generate_report.delay(str(self.report.id))  # type: ignore
 
     def create(
         self, request: Request, *args: list[str], **kwargs: dict[str, Any]
     ) -> Response:
+        existing = Report.objects.filter(
+            user=self.request.user,
+            status__in=[Report.Status.PENDING, Report.Status.PROCESSING],
+        ).first()
+
+        if existing:
+            return Response(
+                {"detail": "You already have a report being generated."}, status=400
+            )
+
         super().create(request, *args, **kwargs)
         return Response(
             {"id": str(self.report.id), "status": self.report.status},
