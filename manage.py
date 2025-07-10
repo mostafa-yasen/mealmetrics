@@ -20,7 +20,7 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    import dotenv  # type: ignore[import-untyped]
+    import dotenv
 
     dotenv.load_dotenv()
 
