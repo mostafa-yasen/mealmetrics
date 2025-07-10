@@ -2,14 +2,17 @@ from __future__ import annotations
 
 import logging
 import os
-from datetime import timedelta
+import time
+from datetime import date, timedelta
 
 import pandas as pd  # type: ignore[import-untyped]
 from celery import shared_task  # type: ignore[import-untyped]
 from django.conf import settings
+from django.contrib.auth.models import User
+from django.db import models
 from django.utils import timezone
 
-from .models import Report
+from .models import FoodLog, Report
 
 _logger = logging.getLogger(__name__)
 
@@ -21,56 +24,76 @@ def debug_celery_task() -> str:
     return "Success"
 
 
-@shared_task  # type: ignore
-def generate_report(report_id: str) -> None:
-    """Generate a report based on the provided report ID."""
-    from django.contrib.auth.models import User  # noqa: PLC0415
-
+@shared_task(rate_limit="10/m")  # type: ignore
+def generate_report(report_id):
+    start = time.time()
+    _logger.info(f"Generating report for ID: {report_id}")
     try:
         report = Report.objects.get(id=report_id)
         report.status = Report.Status.PROCESSING
         report.save()
 
-        # Mock data
-        users = User.objects.filter(reports__isnull=False).distinct()
-        total_users = users.count()
+        users_with_logs = User.objects.filter(food_logs__isnull=False).distinct()
+        total_users = users_with_logs.count()
 
-        # Simulated food log data
-        total_food_items = 10000
-        food_logs_per_day = [
-            {
-                "date": (timezone.now() - timedelta(days=i)).strftime("%Y-%m-%d"),
-                "count": i * 13 % 50,
-            }
-            for i in range(30)
-        ]
-        most_frequent_foods = [
-            {"food": f"Food {i}", "count": 100 - i * 3} for i in range(10)
-        ]
+        unique_foods = FoodLog.objects.values_list("food_name", flat=True).distinct()
+        total_unique_foods = unique_foods.count()
 
-        # Create a Pandas Excel writer
-        df1 = pd.DataFrame(
-            [{"Total Users": total_users, "Total Food Items": total_food_items}]
+        today = date.today()
+        start_date = today - timedelta(days=29)
+
+        date_counts = (
+            FoodLog.objects.filter(date_logged__range=(start_date, today))
+            .values("date_logged")
+            .annotate(count=models.Count("id"))
+            .order_by("date_logged")
         )
-        df2 = pd.DataFrame(food_logs_per_day)
-        df3 = pd.DataFrame(most_frequent_foods)
+        trend_df = pd.DataFrame(date_counts)
 
-        output_dir = os.path.join(settings.BASE_DIR, "media")  # "/reports"
+        food_counts = (
+            FoodLog.objects.values("food_name")
+            .annotate(count=models.Count("id"))
+            .order_by("-count")[:10]
+        )
+        top_foods_df = pd.DataFrame(food_counts)
+
+        category_counts = (
+            FoodLog.objects.values("category")
+            .annotate(count=models.Count("id"))
+            .order_by("-count")
+        )
+        category_df = pd.DataFrame(category_counts)
+
+        output_dir = os.path.join(settings.BASE_DIR, "media")
         os.makedirs(output_dir, exist_ok=True)
+
         filename = f"report_{report.id}.xlsx"
         file_path = os.path.join(output_dir, filename)
 
         with pd.ExcelWriter(file_path, engine="openpyxl") as writer:
-            df1.to_excel(writer, index=False, sheet_name="Summary")
-            df2.to_excel(writer, index=False, sheet_name="Activity Trends")
-            df3.to_excel(writer, index=False, sheet_name="Top Foods")
+            pd.DataFrame(
+                [{"Total Users": total_users, "Unique Food Items": total_unique_foods}]
+            ).to_excel(writer, index=False, sheet_name="Summary")
+
+            trend_df.rename(
+                columns={"date_logged": "Date", "count": "Entries"}
+            ).to_excel(writer, index=False, sheet_name="Trends")
+            top_foods_df.rename(
+                columns={"food_name": "Food", "count": "Count"}
+            ).to_excel(writer, index=False, sheet_name="Top Foods")
+            category_df.rename(
+                columns={"category": "Category", "count": "Count"}
+            ).to_excel(writer, index=False, sheet_name="By Category")
 
         report.status = Report.Status.COMPLETED
-        report.completed_at = timezone.now()
         report.file_path = filename
+        report.completed_at = timezone.now()
         report.save()
-
+        msg = f"✅ Report generated in {time.time() - start} seconds"
+        _logger.info(msg)
     except Exception as e:
         report.status = Report.Status.FAILED
         report.error = str(e)
         report.save()
+        msg = f"❌ Failed to generate report: {str(e)}. After: {time.time() - start} seconds"
+        _logger.error(msg)
