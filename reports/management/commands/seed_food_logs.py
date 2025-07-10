@@ -1,5 +1,6 @@
 import random
 from datetime import date, timedelta
+from typing import TYPE_CHECKING
 
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
@@ -8,6 +9,12 @@ from faker import Faker
 from reports.models import FoodLog
 
 fake = Faker()
+
+if TYPE_CHECKING:
+    from typing import Any
+
+    from django.core.management.base import CommandParser
+
 
 CATEGORIES = ["fruit", "vegetable", "dairy", "protein", "snack"]
 FOOD_NAMES = {
@@ -22,13 +29,13 @@ FOOD_NAMES = {
 class Command(BaseCommand):
     help = "Generate fake users and food logs"
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser: CommandParser) -> None:
         parser.add_argument("--users", type=int, default=10)
         parser.add_argument("--logs", type=int, default=1000)
 
-    def handle(self, *args, **options):
-        user_count = options["users"]
-        log_count = options["logs"]
+    def handle(self, *args: list[Any], **options: int) -> None:
+        user_count: int = options["users"]
+        log_count: int = options["logs"]
 
         self.stdout.write(f"Creating {user_count} users...")
         users = []

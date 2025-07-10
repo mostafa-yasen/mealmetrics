@@ -24,8 +24,8 @@ def debug_celery_task() -> str:
     return "Success"
 
 
-@shared_task(rate_limit="10/m")  # type: ignore
-def generate_report(report_id):
+@shared_task(rate_limit="10/m")  # type: ignore[misc]
+def generate_report(report_id: str) -> None:
     start = time.time()
     _logger.info(f"Generating report for ID: {report_id}")
     try:

@@ -45,5 +45,5 @@ class FoodLog(models.Model):
             models.Index(fields=["category"]),
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.food_name} ({self.category}) - {self.user.username}"

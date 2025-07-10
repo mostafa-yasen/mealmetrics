@@ -27,7 +27,7 @@ class ReportCreateView(generics.CreateAPIView):  # type: ignore[misc]
 
     def perform_create(self, serializer: ReportCreateSerializer) -> None:
         self.report: Report = serializer.save(user=self.request.user)
-        generate_report.delay(str(self.report.id))  # type: ignore
+        generate_report.delay(str(self.report.id))
 
     def create(
         self, request: Request, *args: list[str], **kwargs: dict[str, Any]
