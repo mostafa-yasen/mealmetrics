@@ -46,15 +46,26 @@ jobs:
           python-version: "3.12"
 
       - name: Install uv
-        run: pip install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Cache Python dependencies
+        uses: actions/cache@v3
+        with:
+          path: .venv
+          key: ${{ runner.os }}-python-${{ hashFiles('**/uv.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-python-
 
       - name: Install dependencies
-        run: uv sync --locked
+        run: uv sync --locked && source .venv/bin/activate
 
       - name: Run migrations
         run: |
-          python manage.py makemigrations --noinput
-          python manage.py migrate --noinput
+          .venv/bin/python manage.py makemigrations --noinput
+          .venv/bin/python manage.py migrate --noinput
+
+      - name: Create media directory
+        run: mkdir -p media
 
       - name: Run tests
-        run: pytest --maxfail=1 --disable-warnings
+        run: .venv/bin/pytest --maxfail=1 --disable-warnings
