@@ -4,8 +4,6 @@
 import os
 import sys
 
-import dotenv  # type: ignore[import-untyped]
-
 
 def main() -> None:
     """Run administrative tasks."""
@@ -22,6 +20,8 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    import dotenv  # type: ignore[import-untyped]
+
     dotenv.read_dotenv()
 
     main()
